@@ -1,3 +1,6 @@
+console.log("TensorFlow:", typeof tf);
+console.log("Teachable Machine:", typeof tmImage);
+
 const URL = "./model/";
 
 let model, webcam, labelContainer, maxPredictions;
