@@ -1,42 +1,84 @@
-console.log("TensorFlow:", typeof tf);
-console.log("Teachable Machine:", typeof tmImage);
-
 const URL = "./model/";
 
-let model, webcam, labelContainer, maxPredictions;
+let model;
+let webcam;
+let labelContainer;
+let maxPredictions;
+
+let lastPrediction = 0;
+const UPDATE_TIME = 500; // medio segundo
 
 async function init() {
-    model = await tmImage.load(URL + "model.json", URL + "metadata.json");
+
+    model = await tmImage.load(
+        URL + "model.json",
+        URL + "metadata.json"
+    );
+
     maxPredictions = model.getTotalClasses();
 
-    webcam = new tmImage.Webcam(300, 300, true);
+    webcam = new tmImage.Webcam(
+        window.innerWidth,
+        window.innerHeight,
+        true
+    );
+
     await webcam.setup();
+
     await webcam.play();
 
     window.requestAnimationFrame(loop);
 
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
+    document
+        .getElementById("webcam-container")
+        .appendChild(webcam.canvas);
 
     labelContainer = document.getElementById("label-container");
-    for (let i = 0; i < maxPredictions; i++) {
+
+    for(let i=0;i<maxPredictions;i++){
+
         labelContainer.appendChild(document.createElement("div"));
+
     }
+
 }
 
-async function loop() {
+async function loop(){
+
     webcam.update();
-    await predict();
+
+    const ahora = Date.now();
+
+    if(ahora-lastPrediction>UPDATE_TIME){
+
+        await predict();
+
+        lastPrediction=ahora;
+
+    }
+
     window.requestAnimationFrame(loop);
+
 }
 
-async function predict() {
+async function predict(){
+
     const prediction = await model.predict(webcam.canvas);
 
-    for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-            prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-        labelContainer.childNodes[i].innerHTML = classPrediction;
+    prediction.sort((a,b)=>b.probability-a.probability);
+
+    for(let i=0;i<maxPredictions;i++){
+
+        labelContainer.childNodes[i].innerHTML=
+
+            "<b>"+prediction[i].className+"</b> : "
+
+            +(prediction[i].probability*100).toFixed(1)
+
+            +" %";
+
     }
+
 }
 
 init();
