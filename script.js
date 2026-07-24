@@ -2,11 +2,14 @@ const URL = "./model/";
 
 let model;
 let webcam;
-let labelContainer;
-let maxPredictions;
 
 let lastPrediction = 0;
-const UPDATE_TIME = 500; // medio segundo
+const UPDATE_TIME = 500;      // Analiza cada 0,5 s
+const CHANGE_DELAY = 2000;    // Mantiene el resultado 2 s
+
+let currentClass = "";
+let currentProb = 0;
+let lastChange = 0;
 
 async function init() {
 
@@ -15,8 +18,6 @@ async function init() {
         URL + "metadata.json"
     );
 
-    maxPredictions = model.getTotalClasses();
-
     webcam = new tmImage.Webcam(
         window.innerWidth,
         window.innerHeight,
@@ -24,36 +25,27 @@ async function init() {
     );
 
     await webcam.setup();
-
     await webcam.play();
-
-    window.requestAnimationFrame(loop);
 
     document
         .getElementById("webcam-container")
         .appendChild(webcam.canvas);
 
-    labelContainer = document.getElementById("label-container");
-
-    for(let i=0;i<maxPredictions;i++){
-
-        labelContainer.appendChild(document.createElement("div"));
-
-    }
+    window.requestAnimationFrame(loop);
 
 }
 
-async function loop(){
+async function loop() {
 
     webcam.update();
 
     const ahora = Date.now();
 
-    if(ahora-lastPrediction>UPDATE_TIME){
+    if (ahora - lastPrediction > UPDATE_TIME) {
 
         await predict();
 
-        lastPrediction=ahora;
+        lastPrediction = ahora;
 
     }
 
@@ -61,23 +53,33 @@ async function loop(){
 
 }
 
-async function predict(){
+async function predict() {
 
     const prediction = await model.predict(webcam.canvas);
 
-    prediction.sort((a,b)=>b.probability-a.probability);
+    prediction.sort((a, b) => b.probability - a.probability);
 
-    for(let i=0;i<maxPredictions;i++){
+    const mejorClase = prediction[0].className;
+    const mejorProb = prediction[0].probability * 100;
 
-        labelContainer.childNodes[i].innerHTML=
-
-            "<b>"+prediction[i].className+"</b> : "
-
-            +(prediction[i].probability*100).toFixed(1)
-
-            +" %";
-
+    if (
+        currentClass === "" ||
+        (mejorClase !== currentClass &&
+         Date.now() - lastChange > CHANGE_DELAY)
+    ) {
+        currentClass = mejorClase;
+        currentProb = mejorProb;
+        lastChange = Date.now();
+    } else if (mejorClase === currentClass) {
+        currentProb = mejorProb;
     }
+
+    document.getElementById("label-container").innerHTML = `
+        <div class="resultado">
+            <div class="titulo">${currentClass}</div>
+            <div class="porcentaje">${currentProb.toFixed(1)}%</div>
+        </div>
+    `;
 
 }
 
