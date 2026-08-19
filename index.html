@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mi IA con Cámara</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:#111;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+
+}
+
+#webcam-container{
+
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+canvas{
+
+    width:100vw !important;
+    height:100vh !important;
+    object-fit:cover;
+
+}
+
+#label-container{
+
+    position:fixed;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:90%;
+
+    background:rgba(0,0,0,.65);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    color:white;
+
+    font-size:28px;
+
+    backdrop-filter:blur(8px);
+
+}
+
+#label-container div{
+
+    padding:8px;
+
+}
+
+
+.resultado{
+
+    text-align:center;
+
+}
+
+.titulo{
+
+    font-size:60px;
+
+    font-weight:bold;
+
+    letter-spacing:2px;
+
+    margin-bottom:10px;
+
+    text-transform:uppercase;
+
+}
+
+.porcentaje{
+
+    font-size:36px;
+
+    color:#66ff99;
+
+    font-weight:bold;
+
+}
+
+
+
+
+
+    
+</style>
+
+</head>
+
+<body>
+
+<div id="webcam-container"></div>
+
+<div id="label-container"></div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
