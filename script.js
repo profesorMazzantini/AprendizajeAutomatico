@@ -5,7 +5,7 @@ let webcam;
 
 let lastPrediction = 0;
 const UPDATE_TIME = 500;      // Analiza cada 0,5 s
-const CHANGE_DELAY = 2000;    // Mantiene el resultado 2 s
+const CHANGE_DELAY = 3000;    // Mantiene el resultado 3 s
 
 let currentClass = "";
 let currentProb = 0;
